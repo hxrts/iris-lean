@@ -16,3 +16,4 @@ import Iris.Algebra.View
 import Iris.Algebra.HeapView
 import Iris.Algebra.Monoid
 import Iris.Algebra.BigOp
+import Iris.Algebra.Auth
