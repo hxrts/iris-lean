@@ -12,12 +12,12 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `agree.v`
   - [x] CMRA 
   - [x] Functors
-- [ ] `auth.v`
-  - [ ] CMRA
-  - [ ] Updates
-  - [ ] Functors
-- [ ] `big_op.v`
-  - TBD (Zongyuan?)
+- [x] `auth.v`
+  - [x] CMRA
+  - [x] Updates
+  - [x] Functors
+- [x] `big_op.v`
+  - [x] `bigOpL`, `bigOpM` definitions and lemmas
 - [ ] `cmra.v`
   - [x] Lemmas
   - [ ] Total CMRA construction
@@ -33,8 +33,8 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [x] Isomorphisms
 - [ ] `cmra_big_op.v` 
 - [ ] `coPset.v`
-  - [ ] coPset definition
-  - [ ] CMRA
+  - [x] coPset definition
+  - [x] CMRA
 - [x] `cofe_solver.v` 
 - [ ] `csum.v`
   - [ ] CMRA
@@ -54,15 +54,15 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `functions.v` (nb. contained in `CMRA.lean`)
   - [x] CMRA
   - [ ] Updates
-- [ ] `gmap.v` (nb. generalized in `Heap.lean`)
+- [x] `gmap.v` (nb. generalized in `Heap.lean`)
   - [x] CMRA
   - [ ] Updates
-  - [ ] Functors
+  - [x] Functors
 - [ ] `gmultiset.v` 
   - [ ] CMRA
   - [ ] Updates
 - [ ] `gset.v` 
-  - [ ] CMRA
+  - [x] CMRA
   - [ ] Updates
 - [ ] `list.v` 
   - Is this an instance of the `Heap` CMRA?
@@ -72,7 +72,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `max_prefix_list.v` 
   - [ ] Lemmas
   - [ ] Functors
-- [ ] `monoid.v`
+- [x] `monoid.v`
 - [ ] `mra.v`
 - [x] `numbers.v`
 - [ ]  `ofe.v`
@@ -111,10 +111,10 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `vector.v` 
   - [ ] CMRA
   - [ ] Functors
-- [ ] `view.v` 
+- [x] `view.v`
   - [x] CMRA
   - [x] Updates
-  - [ ] Functors
+  - [x] Functors
 - [ ] `lib/dfrac_agree.v` 
   - [ ] Lemmas
   - [ ] Updates
@@ -126,10 +126,10 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] Lemmas
   - [ ] Updates
   - [ ] Functors
-- [ ] `lib/gmap_view.v` (nb. generalized in `HeapView.lean`)
+- [x] `lib/gmap_view.v` (nb. generalized in `HeapView.lean`)
   - [x] CMRA
   - [x] Updates
-  - [ ] Functors
+  - [x] Functors
 - [ ] `lib/gset_bij.v` 
 - [ ] `lib/mono_Z.v` (nb. generalize to `MonoNumbers.lean`)
 - [ ] `lib/mono_list.v` 
@@ -165,8 +165,8 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `lib/boxes.v`
 - [ ] `lib/cancelable_invariants.v`
 - [ ] `lib/fancy_updates.v`
-  - [ ] FUpd instance
-  - [ ] Soundness
+  - [x] FUpd instance
+  - [x] Soundness
   - [ ] ProofMode instances
 - [ ] `lib/fancy_updates_from_vs.v`
 - [ ] `lib/gen_heap.v`
@@ -192,14 +192,15 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `lib/proph_map.v`
 - [ ] `lib/saved_prop.v`
 - [ ] `lib/token.v`
-- [ ] `lib/wsat.v`
+- [x] `lib/wsat.v`
 
 ## BI
 
 - [ ] `algebra.v`
 - `ascii.v`
 - [x] `bi.v`
-- [ ] `big_op.v`
+- [x] `big_op.v`
+  - [x] `big_sepL`, `big_sepM` definitions and lemmas
 - [ ] `cmra.v`
 - [x] `derived_connectives.v`
 - [ ] `derived_laws.v`
@@ -425,5 +426,3 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] `language.v`
   - [ ] `ectx_language.v`
   - [ ] `ectxi_language.v`
-
-
