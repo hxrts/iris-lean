@@ -1,6 +1,7 @@
 import Iris.Algebra.Agree
 import Iris.Algebra.CMRA
 import Iris.Algebra.COFESolver
+import Iris.Algebra.CoPset
 import Iris.Algebra.DFrac
 import Iris.Algebra.Excl
 import Iris.Algebra.Frac
@@ -13,3 +14,6 @@ import Iris.Algebra.UPred
 import Iris.Algebra.Heap
 import Iris.Algebra.View
 import Iris.Algebra.HeapView
+import Iris.Algebra.Auth
+import Iris.Algebra.Monoid
+import Iris.Algebra.BigOp
