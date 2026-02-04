@@ -16,7 +16,7 @@ provides agreement.
 
 ## Main Definitions
 
-- `GhostVarR` — carrier CMRA: `DFrac F × Agree (LeibnizO A)`
+- `GhostVarR` — carrier CMRA: `DFrac F × Agree A`
 - `GhostVarF` — constant OFunctor wrapping the carrier
 - `ghost_var` — ghost variable predicate `ghost_var γ dq a`
 
@@ -57,13 +57,21 @@ abbrev GhostVarF (F : Type _) (A : Type _) [UFraction F] [OFE A] :
 
 variable [ElemG GF (GhostVarF F A)]
 
-/-! ## Constructor -/
+/-! ## Helpers -/
 
-/-- Construct the CMRA element for a ghost variable: `(DFrac.own q, toAgree a)`.
+/-- `toAgree a` is always valid (singleton list). -/
+private theorem toAgree_valid (a : A) : CMRA.Valid (toAgree a) :=
+  fun _ => trivial
 
-    Coq: `to_frac_agree` -/
-private def to_frac_agree (dq : DFrac F) (a : A) : GhostVarR F A :=
-  (dq, toAgree a)
+/-- Validity at step 0 of two composed dfrac-agree pairs gives valid
+    combined fraction and equal values. -/
+private theorem dfrac_agree_op_valid0 {dq1 dq2 : DFrac F}
+    {a1 a2 : A} :
+    CMRA.ValidN 0 ((dq1, toAgree a1) • (dq2, toAgree a2)) →
+    DFrac.valid (DFrac.op dq1 dq2) ∧ a1 = a2 := by
+  intro ⟨hdq, hagr⟩
+  exact ⟨hdq,
+    (toAgree_op_valid_iff_eq (α := A)).mp (CMRA.discrete_valid hagr)⟩
 
 /-! ## Definition -/
 
@@ -73,7 +81,7 @@ private def to_frac_agree (dq : DFrac F) (a : A) : GhostVarR F A :=
     Coq: `ghost_var` -/
 noncomputable def ghost_var (γ : GName) (dq : DFrac F) (a : A) :
     IProp GF :=
-  iOwn (GF := GF) (F := GhostVarF F A) γ (to_frac_agree dq a)
+  iOwn (GF := GF) (F := GhostVarF F A) γ (dq, toAgree a)
 
 /-! ## Instances -/
 
@@ -84,8 +92,13 @@ noncomputable def ghost_var (γ : GName) (dq : DFrac F) (a : A) :
 
     Coq: `ghost_var_persistent` (via `dfrac_agree`) -/
 instance ghost_var_persistent (γ : GName) (a : A) :
-    Persistent (ghost_var (GF := GF) (F := F) γ .discard a) := by
-  sorry
+    Persistent (ghost_var (GF := GF) (F := F) γ .discard a) where
+  persistent := by
+    haveI : CMRA.CoreId (DFrac.discard (F := F), toAgree a) :=
+      CMRA.CoreId.of_pcore_eq_some (x := (DFrac.discard (F := F), toAgree a))
+        rfl
+    simp only [ghost_var]
+    exact persistently_intro
 
 /-! ## Allocation -/
 
@@ -95,7 +108,8 @@ instance ghost_var_persistent (γ : GName) (a : A) :
 theorem ghost_var_alloc (a : A) :
     ⊢ BUpd.bupd (BIBase.«exists» fun γ =>
       ghost_var (GF := GF) (F := F) γ (DFrac.own 1) a) := by
-  sorry
+  simp only [ghost_var]
+  exact iOwn_alloc _ ⟨DFrac.valid_own_one, toAgree_valid a⟩
 
 /-! ## Validity and Agreement -/
 
@@ -109,7 +123,11 @@ theorem ghost_var_valid_2 (γ : GName) (dq1 dq2 : DFrac F)
       (ghost_var (GF := GF) γ dq1 a1)
       (ghost_var (GF := GF) γ dq2 a2)
       ⊢ BIBase.pure (DFrac.valid (DFrac.op dq1 dq2) ∧ a1 = a2) := by
-  sorry
+  simp only [ghost_var]
+  refine (iOwn_cmraValid_op (GF := GF)
+    (F := GhostVarF F A) (γ := γ)).trans ?_
+  refine (UPred.cmraValid_elim _).trans ?_
+  exact BI.pure_mono dfrac_agree_op_valid0
 
 /-- Two ghost variables at the same name agree on value.
 
@@ -119,8 +137,8 @@ theorem ghost_var_agree (γ : GName) (dq1 dq2 : DFrac F)
     BIBase.sep
       (ghost_var (GF := GF) γ dq1 a1)
       (ghost_var (GF := GF) γ dq2 a2)
-      ⊢ BIBase.pure (a1 = a2) := by
-  sorry
+      ⊢ BIBase.pure (a1 = a2) :=
+  (ghost_var_valid_2 γ dq1 dq2 a1 a2).trans (BI.pure_mono And.right)
 
 /-! ## Updates -/
 
@@ -129,8 +147,13 @@ theorem ghost_var_agree (γ : GName) (dq1 dq2 : DFrac F)
     Coq: `ghost_var_update` -/
 theorem ghost_var_update (γ : GName) (a b : A) :
     ghost_var (GF := GF) (F := F) γ (DFrac.own 1) a
-      ⊢ BUpd.bupd (ghost_var (GF := GF) (F := F) γ (DFrac.own 1) b) := by
-  sorry
+      ⊢ BUpd.bupd
+          (ghost_var (GF := GF) (F := F) γ (DFrac.own 1) b) := by
+  simp only [ghost_var]
+  haveI : CMRA.Exclusive (DFrac.own (1 : F), toAgree a) :=
+    ⟨fun y hv => CMRA.exclusive0_l (x := DFrac.own (1 : F)) y.1 hv.1⟩
+  exact iOwn_update (GF := GF) (F := GhostVarF F A) (γ := γ)
+    (Update.exclusive ⟨DFrac.valid_own_one, toAgree_valid b⟩)
 
 /-- Update a ghost variable with two complementary fractions.
 
@@ -143,7 +166,22 @@ theorem ghost_var_update_2 (γ : GName) (q1 q2 : F)
       ⊢ BUpd.bupd (BIBase.sep
           (ghost_var (GF := GF) γ (.own q1) b)
           (ghost_var (GF := GF) γ (.own q2) b)) := by
-  sorry
+  simp only [ghost_var]
+  refine (iOwn_op (GF := GF) (F := GhostVarF F A) (γ := γ)).mpr.trans ?_
+  have hupd : (DFrac.own q1, toAgree a1) • (DFrac.own q2, toAgree a2)
+      ~~> (DFrac.own q1, toAgree b) • (DFrac.own q2, toAgree b) := by
+    have hexcl : CMRA.Exclusive (DFrac.own (q1 + q2)) :=
+      DFrac.own_whole_exclusive (hfull ▸ UFraction.one_whole)
+    haveI : CMRA.Exclusive
+        ((DFrac.own q1, toAgree a1) • (DFrac.own q2, toAgree a2)) :=
+      ⟨fun y hv => hexcl.exclusive0_l y.1 hv.1⟩
+    refine Update.exclusive ⟨?_, (toAgree_op_valid_iff_eq (α := A)).mpr rfl⟩
+    show DFrac.valid (DFrac.own (q1 + q2))
+    exact hfull ▸ DFrac.valid_own_one
+  refine (iOwn_update (GF := GF) (F := GhostVarF F A) (γ := γ)
+    hupd).trans ?_
+  exact BIUpdate.mono (iOwn_op (GF := GF) (F := GhostVarF F A)
+    (γ := γ)).mp
 
 /-! ## Persistence -/
 
@@ -152,7 +190,11 @@ theorem ghost_var_update_2 (γ : GName) (q1 q2 : F)
     Coq: `ghost_var_persist` (via `dfrac_agree_persist`) -/
 theorem ghost_var_persist (γ : GName) (dq : DFrac F) (a : A) :
     ghost_var (GF := GF) γ dq a
-      ⊢ BUpd.bupd (ghost_var (GF := GF) (F := F) γ .discard a) := by
-  sorry
+      ⊢ BUpd.bupd
+          (ghost_var (GF := GF) (F := F) γ .discard a) := by
+  simp only [ghost_var]
+  exact iOwn_update (GF := GF) (F := GhostVarF F A) (γ := γ)
+    (Update.prod (dq, toAgree a)
+      (DFrac.DFrac.update_discard) Update.id)
 
 end Iris.BaseLogic

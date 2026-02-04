@@ -41,6 +41,9 @@ The file follows a "generic then specialize" pattern:
   proof mode instances, and `Timeless` instances are omitted.
 - Saved predicates (`saved_pred_own`) are omitted — they require discrete
   function space infrastructure (`A -d> ...`) not yet ported.
+- Agreement theorems (`saved_anything_agree`, `saved_prop_agree`) require
+  internal equality (`≡` as a BI connective) which is not yet ported.
+  These are left as `sorry`.
 -/
 
 namespace Iris.BaseLogic
@@ -49,14 +52,12 @@ open Iris Iris.Algebra Iris.Std Iris.BI COFE
 
 variable {GF : BundledGFunctors} {F : Type _} [UFraction F]
 
-/-! ## Constructor -/
+/-! ## Helpers -/
 
-/-- Construct the CMRA element for a dfrac-agree pair.
-
-    Coq: `to_dfrac_agree` -/
-private def to_dfrac_agree [OFE X] (dq : DFrac F) (x : X) :
-    DFrac F × Agree X :=
-  (dq, toAgree x)
+/-- `toAgree x` is always valid (singleton list). -/
+private theorem toAgree_valid' {X : Type _} [OFE X] (x : X) :
+    CMRA.Valid (toAgree x) :=
+  fun _ => trivial
 
 /-! ## Generic: Saved Anything -/
 
@@ -87,8 +88,7 @@ variable [ElemG GF (SavedAnythingF GF F G)]
 noncomputable def saved_anything_own
     (γ : GName) (dq : DFrac F) (x : G (IProp GF) (IProp GF)) :
     IProp GF :=
-  iOwn (GF := GF) (F := SavedAnythingF GF F G) γ
-    (to_dfrac_agree dq x)
+  iOwn (GF := GF) (F := SavedAnythingF GF F G) γ (dq, toAgree x)
 
 /-! ### Saved Anything Instances -/
 
@@ -101,8 +101,13 @@ noncomputable def saved_anything_own
 instance saved_anything_persistent (γ : GName)
     (x : G (IProp GF) (IProp GF)) :
     Persistent (saved_anything_own (GF := GF) (F := F) (G := G)
-      γ .discard x) := by
-  sorry
+      γ .discard x) where
+  persistent := by
+    haveI : CMRA.CoreId (DFrac.discard (F := F), toAgree x) :=
+      CMRA.CoreId.of_pcore_eq_some
+        (x := (DFrac.discard (F := F), toAgree x)) rfl
+    simp only [saved_anything_own]
+    exact persistently_intro
 
 /-! ### Saved Anything Allocation -/
 
@@ -113,7 +118,8 @@ theorem saved_anything_alloc (dq : DFrac F) (hdq : DFrac.valid dq)
     (x : G (IProp GF) (IProp GF)) :
     ⊢ BUpd.bupd (BIBase.«exists» fun γ =>
       saved_anything_own (GF := GF) (F := F) (G := G) γ dq x) := by
-  sorry
+  simp only [saved_anything_own]
+  exact iOwn_alloc _ ⟨hdq, toAgree_valid' x⟩
 
 /-! ### Saved Anything Validity and Agreement -/
 
@@ -124,12 +130,21 @@ theorem saved_anything_valid (γ : GName) (dq : DFrac F)
     (x : G (IProp GF) (IProp GF)) :
     saved_anything_own (GF := GF) (F := F) (G := G) γ dq x
       ⊢ BIBase.pure (DFrac.valid dq) := by
-  sorry
+  simp only [saved_anything_own]
+  refine (iOwn_cmraValid (GF := GF)
+    (F := SavedAnythingF GF F G) (γ := γ)).trans ?_
+  refine (UPred.cmraValid_elim _).trans ?_
+  exact BI.pure_mono And.left
 
 /-- Two saved-anything at the same name agree on value (up to OFE
     equivalence).
 
-    Coq: `saved_anything_agree` -/
+    Coq: `saved_anything_agree`
+
+    TODO: Requires internal equality (`≡` as BI connective) and the
+    `Later` OFE wrapper. The Coq conclusion is `▷ (x ≡ y)` using
+    internal equality; the stub uses `pure (x ≡ y)` which is too strong
+    without discreteness. -/
 theorem saved_anything_agree (γ : GName) (dq1 dq2 : DFrac F)
     (x y : G (IProp GF) (IProp GF)) :
     BIBase.sep
@@ -148,7 +163,10 @@ theorem saved_anything_persist (γ : GName) (dq : DFrac F)
     saved_anything_own (GF := GF) (F := F) (G := G) γ dq x
       ⊢ BUpd.bupd (saved_anything_own (GF := GF) (F := F) (G := G)
           γ .discard x) := by
-  sorry
+  simp only [saved_anything_own]
+  exact iOwn_update (GF := GF) (F := SavedAnythingF GF F G) (γ := γ)
+    (Update.prod (dq, toAgree x)
+      DFrac.DFrac.update_discard Update.id)
 
 /-- Update a saved-anything with full ownership.
 
@@ -159,7 +177,11 @@ theorem saved_anything_update (γ : GName)
         γ (DFrac.own 1) x
       ⊢ BUpd.bupd (saved_anything_own (GF := GF) (F := F) (G := G)
           γ (DFrac.own 1) y) := by
-  sorry
+  simp only [saved_anything_own]
+  haveI : CMRA.Exclusive (DFrac.own (1 : F), toAgree x) :=
+    ⟨fun y hv => CMRA.exclusive0_l (x := DFrac.own (1 : F)) y.1 hv.1⟩
+  exact iOwn_update (GF := GF) (F := SavedAnythingF GF F G) (γ := γ)
+    (Update.exclusive ⟨DFrac.valid_own_one, toAgree_valid' y⟩)
 
 /-! ## Saved Propositions -/
 
@@ -192,7 +214,7 @@ variable [ElemG GF (SavedPropF GF F)]
     Coq: `saved_prop_own` -/
 noncomputable def saved_prop_own (γ : GName) (dq : DFrac F)
     (P : IProp GF) : IProp GF :=
-  iOwn (GF := GF) (F := SavedPropF GF F) γ (to_dfrac_agree dq P)
+  iOwn (GF := GF) (F := SavedPropF GF F) γ (dq, toAgree P)
 
 /-! ### Saved Proposition Instances -/
 
@@ -200,8 +222,13 @@ noncomputable def saved_prop_own (γ : GName) (dq : DFrac F)
 
     Coq: `saved_prop_discarded_persistent` -/
 instance saved_prop_persistent (γ : GName) (P : IProp GF) :
-    Persistent (saved_prop_own (GF := GF) (F := F) γ .discard P) := by
-  sorry
+    Persistent (saved_prop_own (GF := GF) (F := F) γ .discard P) where
+  persistent := by
+    haveI : CMRA.CoreId (DFrac.discard (F := F), toAgree P) :=
+      CMRA.CoreId.of_pcore_eq_some
+        (x := (DFrac.discard (F := F), toAgree P)) rfl
+    simp only [saved_prop_own]
+    exact persistently_intro
 
 /-! ### Saved Proposition Allocation -/
 
@@ -212,13 +239,19 @@ theorem saved_prop_alloc (dq : DFrac F) (hdq : DFrac.valid dq)
     (P : IProp GF) :
     ⊢ BUpd.bupd (BIBase.«exists» fun γ =>
       saved_prop_own (GF := GF) (F := F) γ dq P) := by
-  sorry
+  simp only [saved_prop_own]
+  exact iOwn_alloc _ ⟨hdq, toAgree_valid' P⟩
 
 /-! ### Saved Proposition Agreement -/
 
 /-- Two saved propositions at the same name agree up to `▷`.
 
-    Coq: `saved_prop_agree` -/
+    Coq: `saved_prop_agree`
+
+    TODO: Requires internal equality (`≡` as BI connective) and the
+    `Later` OFE wrapper. The Coq conclusion is `▷ (P ≡ Q)` using
+    internal equality; the stub uses `▷ (pure (P = Q))` which requires
+    Leibniz equality. -/
 theorem saved_prop_agree (γ : GName) (dq1 dq2 : DFrac F)
     (P Q : IProp GF) :
     BIBase.sep
@@ -236,7 +269,10 @@ theorem saved_prop_persist (γ : GName) (dq : DFrac F) (P : IProp GF) :
     saved_prop_own (GF := GF) (F := F) γ dq P
       ⊢ BUpd.bupd
           (saved_prop_own (GF := GF) (F := F) γ .discard P) := by
-  sorry
+  simp only [saved_prop_own]
+  exact iOwn_update (GF := GF) (F := SavedPropF GF F) (γ := γ)
+    (Update.prod (dq, toAgree P)
+      DFrac.DFrac.update_discard Update.id)
 
 /-- Update a saved proposition with full ownership.
 
@@ -245,6 +281,10 @@ theorem saved_prop_update (γ : GName) (P Q : IProp GF) :
     saved_prop_own (GF := GF) (F := F) γ (DFrac.own 1) P
       ⊢ BUpd.bupd
           (saved_prop_own (GF := GF) (F := F) γ (DFrac.own 1) Q) := by
-  sorry
+  simp only [saved_prop_own]
+  haveI : CMRA.Exclusive (DFrac.own (1 : F), toAgree P) :=
+    ⟨fun y hv => CMRA.exclusive0_l (x := DFrac.own (1 : F)) y.1 hv.1⟩
+  exact iOwn_update (GF := GF) (F := SavedPropF GF F) (γ := γ)
+    (Update.exclusive ⟨DFrac.valid_own_one, toAgree_valid' Q⟩)
 
 end Iris.BaseLogic

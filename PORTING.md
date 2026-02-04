@@ -172,7 +172,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [x] `lib/gen_heap.v` — `GenHeap.lean` (meta system omitted)
 - [ ] `lib/gen_inv_heap.v`
 - [x] `lib/ghost_map.v` — `GhostMap.lean`
-- [~] `lib/ghost_var.v` — stubs (`GhostVar.lean`)
+- [x] `lib/ghost_var.v` — `GhostVar.lean` (`Fractional`/`AsFractional`/`Timeless` instances omitted)
 - [ ] `lib/gset_bij.v`
 - [x] `lib/invariants.v`
 - [ ] `lib/iprop.v`
@@ -190,7 +190,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] Proofmode instances
   - [ ] Own/Forall lemmas
 - [ ] `lib/proph_map.v`
-- [~] `lib/saved_prop.v` — stubs (`SavedProp.lean`)
+- [~] `lib/saved_prop.v` — `SavedProp.lean` (agreement theorems blocked on internal equality; `Later` wrapper omitted)
 - [ ] `lib/token.v`
 - [x] `lib/wsat.v`
 
