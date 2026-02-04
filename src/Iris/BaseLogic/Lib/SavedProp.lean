@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sam Hart
 -/
 import Iris.Instances.IProp.Instance
+import Iris.Instances.UPred.InternalEq
 
 /-! # Saved Propositions
 
@@ -41,9 +42,9 @@ The file follows a "generic then specialize" pattern:
   proof mode instances, and `Timeless` instances are omitted.
 - Saved predicates (`saved_pred_own`) are omitted — they require discrete
   function space infrastructure (`A -d> ...`) not yet ported.
-- Agreement theorems (`saved_anything_agree`, `saved_prop_agree`) require
-  internal equality (`≡` as a BI connective) which is not yet ported.
-  These are left as `sorry`.
+- Agreement theorems use `UPred.eq` (step-indexed internal equality)
+  directly rather than a generic BI internal equality connective. The
+  full `internal_eq.v` port requires SBI infrastructure not yet available.
 -/
 
 namespace Iris.BaseLogic
@@ -136,22 +137,22 @@ theorem saved_anything_valid (γ : GName) (dq : DFrac F)
   refine (UPred.cmraValid_elim _).trans ?_
   exact BI.pure_mono And.left
 
-/-- Two saved-anything at the same name agree on value (up to OFE
-    equivalence).
+/-- Two saved-anything at the same name agree on value (internal equality).
 
-    Coq: `saved_anything_agree`
+    The conclusion `UPred.eq x y` holds at step `n` iff `x ≡{n}≡ y`.
+    This is the Lean analog of Coq's internal equality `x ≡ y`.
 
-    TODO: Requires internal equality (`≡` as BI connective) and the
-    `Later` OFE wrapper. The Coq conclusion is `▷ (x ≡ y)` using
-    internal equality; the stub uses `pure (x ≡ y)` which is too strong
-    without discreteness. -/
+    Coq: `saved_anything_agree` -/
 theorem saved_anything_agree (γ : GName) (dq1 dq2 : DFrac F)
     (x y : G (IProp GF) (IProp GF)) :
     BIBase.sep
       (saved_anything_own (GF := GF) (F := F) (G := G) γ dq1 x)
       (saved_anything_own (GF := GF) (F := F) (G := G) γ dq2 y)
-      ⊢ BIBase.pure (x ≡ y) := by
-  sorry
+      ⊢ UPred.eq x y := by
+  simp only [saved_anything_own]
+  exact (iOwn_cmraValid_op (GF := GF)
+    (F := SavedAnythingF GF F G) (γ := γ)).trans
+    (fun _ _ _ hv => Agree.toAgree_op_validN_iff_dist.mp hv.2)
 
 /-! ### Saved Anything Update and Persistence -/
 
@@ -244,21 +245,24 @@ theorem saved_prop_alloc (dq : DFrac F) (hdq : DFrac.valid dq)
 
 /-! ### Saved Proposition Agreement -/
 
-/-- Two saved propositions at the same name agree up to `▷`.
+/-- Two saved propositions at the same name agree (internal equality).
 
-    Coq: `saved_prop_agree`
+    The conclusion `UPred.eq P Q` holds at step `n` iff `P ≡{n}≡ Q`.
+    In Coq, the conclusion is `▷ (P ≡ Q)` because the carrier wraps in
+    `Next`; in the Lean port the `Later` wrapper is omitted (see module
+    doc), so the conclusion is direct internal equality without `▷`.
 
-    TODO: Requires internal equality (`≡` as BI connective) and the
-    `Later` OFE wrapper. The Coq conclusion is `▷ (P ≡ Q)` using
-    internal equality; the stub uses `▷ (pure (P = Q))` which requires
-    Leibniz equality. -/
+    Coq: `saved_prop_agree` -/
 theorem saved_prop_agree (γ : GName) (dq1 dq2 : DFrac F)
     (P Q : IProp GF) :
     BIBase.sep
       (saved_prop_own (GF := GF) (F := F) γ dq1 P)
       (saved_prop_own (GF := GF) (F := F) γ dq2 Q)
-      ⊢ BIBase.later (BIBase.pure (P = Q)) := by
-  sorry
+      ⊢ UPred.eq P Q := by
+  simp only [saved_prop_own]
+  exact (iOwn_cmraValid_op (GF := GF)
+    (F := SavedPropF GF F) (γ := γ)).trans
+    (fun _ _ _ hv => Agree.toAgree_op_validN_iff_dist.mp hv.2)
 
 /-! ### Saved Proposition Update and Persistence -/
 
