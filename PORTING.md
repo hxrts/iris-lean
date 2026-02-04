@@ -169,10 +169,10 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [x] Soundness
   - [ ] ProofMode instances
 - [ ] `lib/fancy_updates_from_vs.v`
-- [~] `lib/gen_heap.v` — stubs (`GenHeap.lean`)
+- [x] `lib/gen_heap.v` — `GenHeap.lean` (meta system omitted)
 - [ ] `lib/gen_inv_heap.v`
-- [~] `lib/ghost_map.v` — stubs (`GhostMap.lean`)
-- [ ] `lib/ghost_var.v`
+- [x] `lib/ghost_map.v` — `GhostMap.lean`
+- [~] `lib/ghost_var.v` — stubs (`GhostVar.lean`)
 - [ ] `lib/gset_bij.v`
 - [x] `lib/invariants.v`
 - [ ] `lib/iprop.v`
@@ -190,7 +190,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] Proofmode instances
   - [ ] Own/Forall lemmas
 - [ ] `lib/proph_map.v`
-- [ ] `lib/saved_prop.v`
+- [~] `lib/saved_prop.v` — stubs (`SavedProp.lean`)
 - [ ] `lib/token.v`
 - [x] `lib/wsat.v`
 
