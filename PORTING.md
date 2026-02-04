@@ -186,17 +186,18 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `lib/own.v`
   - [x] Definition
   - [x] Updates
+  - [x] Auth composition — `AuthOwn.lean` (`auth_own_frag_included`, `auth_own_update`, `auth_own_alloc`)
   - [ ] Big ops
   - [ ] Proofmode instances
   - [ ] Own/Forall lemmas
 - [ ] `lib/proph_map.v`
-- [~] `lib/saved_prop.v` — `SavedProp.lean` (agreement theorems blocked on internal equality; `Later` wrapper omitted)
+- [~] `lib/saved_prop.v` — `SavedProp.lean` (agreement uses `UPred.eq` directly; `Later` wrapper omitted; `Fractional`/`AsFractional`/`Timeless` instances omitted)
 - [ ] `lib/token.v`
 - [x] `lib/wsat.v`
 
 ## BI
 
-- [ ] `algebra.v`
+- [ ] `algebra.v` (nb. `prod_validI`, `to_agree_op_validI` in `Instances/UPred/InternalEq.lean`)
 - `ascii.v`
 - [x] `bi.v`
 - [x] `big_op.v`
@@ -216,7 +217,11 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] BIPureForall
 - [ ] `interface.v` 
   - [ ] Later instances
-- [ ] `internal_eq.v`
+- [ ] `internal_eq.v` (nb. `UPred.eq` + bridge lemmas in `Instances/UPred/InternalEq.lean`; full port needs SBI)
+  - [x] `internal_eq_refl`
+  - [x] `internal_eq_persistent`
+  - [x] `to_agree_op_validI` (forward direction, as `cmraValid_agree_internal_eq`)
+  - [x] `prod_validI` (as `cmraValid_prod_fst`, `cmraValid_prod_snd`)
 - [ ] `monopred.v`
   - [ ] COFE
   - [ ] BI instance
