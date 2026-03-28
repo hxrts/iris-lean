@@ -12,12 +12,12 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `agree.v`
   - [x] CMRA 
   - [x] Functors
-- [ ] `auth.v`
-  - [ ] CMRA
-  - [ ] Updates
-  - [ ] Functors
-- [ ] `big_op.v`
-  - TBD (Zongyuan?)
+- [x] `auth.v`
+  - [x] CMRA
+  - [x] Updates
+  - [x] Functors
+- [x] `big_op.v`
+  - [x] `bigOpL`, `bigOpM` definitions and lemmas
 - [ ] `cmra.v`
   - [x] Lemmas
   - [ ] Total CMRA construction
@@ -33,8 +33,8 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [x] Isomorphisms
 - [ ] `cmra_big_op.v` 
 - [ ] `coPset.v`
-  - [ ] coPset definition
-  - [ ] CMRA
+  - [x] coPset definition
+  - [x] CMRA
 - [x] `cofe_solver.v` 
 - [ ] `csum.v`
   - [ ] CMRA
@@ -54,15 +54,15 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `functions.v` (nb. contained in `CMRA.lean`)
   - [x] CMRA
   - [ ] Updates
-- [ ] `gmap.v` (nb. generalized in `Heap.lean`)
+- [x] `gmap.v` (nb. generalized in `Heap.lean`)
   - [x] CMRA
   - [ ] Updates
-  - [ ] Functors
+  - [x] Functors
 - [ ] `gmultiset.v` 
   - [ ] CMRA
   - [ ] Updates
 - [ ] `gset.v` 
-  - [ ] CMRA
+  - [x] CMRA
   - [ ] Updates
 - [ ] `list.v` 
   - Is this an instance of the `Heap` CMRA?
@@ -72,7 +72,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `max_prefix_list.v` 
   - [ ] Lemmas
   - [ ] Functors
-- [ ] `monoid.v`
+- [x] `monoid.v`
 - [ ] `mra.v`
 - [x] `numbers.v`
 - [ ]  `ofe.v`
@@ -111,10 +111,10 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `vector.v` 
   - [ ] CMRA
   - [ ] Functors
-- [ ] `view.v` 
+- [x] `view.v`
   - [x] CMRA
   - [x] Updates
-  - [ ] Functors
+  - [x] Functors
 - [ ] `lib/dfrac_agree.v` 
   - [ ] Lemmas
   - [ ] Updates
@@ -126,10 +126,10 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] Lemmas
   - [ ] Updates
   - [ ] Functors
-- [ ] `lib/gmap_view.v` (nb. generalized in `HeapView.lean`)
+- [x] `lib/gmap_view.v` (nb. generalized in `HeapView.lean`)
   - [x] CMRA
   - [x] Updates
-  - [ ] Functors
+  - [x] Functors
 - [ ] `lib/gset_bij.v` 
 - [ ] `lib/mono_Z.v` (nb. generalize to `MonoNumbers.lean`)
 - [ ] `lib/mono_list.v` 
@@ -163,18 +163,18 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [x] Later lemmas
   - [x] Update lemmas
 - [ ] `lib/boxes.v`
-- [ ] `lib/cancelable_invariants.v`
+- [x] `lib/cancelable_invariants.v`
 - [ ] `lib/fancy_updates.v`
-  - [ ] FUpd instance
-  - [ ] Soundness
+  - [x] FUpd instance
+  - [x] Soundness
   - [ ] ProofMode instances
 - [ ] `lib/fancy_updates_from_vs.v`
-- [ ] `lib/gen_heap.v`
+- [x] `lib/gen_heap.v` — `GenHeap.lean` (meta system omitted)
 - [ ] `lib/gen_inv_heap.v`
-- [ ] `lib/ghost_map.v`
-- [ ] `lib/ghost_var.v`
+- [x] `lib/ghost_map.v` — `GhostMap.lean`
+- [x] `lib/ghost_var.v` — `GhostVar.lean` (`Fractional`/`AsFractional`/`Timeless` instances omitted)
 - [ ] `lib/gset_bij.v`
-- [ ] `lib/invariants.v`
+- [x] `lib/invariants.v`
 - [ ] `lib/iprop.v`
   - [x] Definition
   - [ ] subG 
@@ -186,20 +186,22 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `lib/own.v`
   - [x] Definition
   - [x] Updates
+  - [x] Auth composition — `AuthOwn.lean` (`auth_own_frag_included`, `auth_own_update`, `auth_own_alloc`)
   - [ ] Big ops
   - [ ] Proofmode instances
   - [ ] Own/Forall lemmas
 - [ ] `lib/proph_map.v`
-- [ ] `lib/saved_prop.v`
+- [~] `lib/saved_prop.v` — `SavedProp.lean` (agreement uses `UPred.eq` directly; `Later` wrapper omitted; `Fractional`/`AsFractional`/`Timeless` instances omitted)
 - [ ] `lib/token.v`
-- [ ] `lib/wsat.v`
+- [x] `lib/wsat.v`
 
 ## BI
 
-- [ ] `algebra.v`
+- [ ] `algebra.v` (nb. `prod_validI`, `to_agree_op_validI` in `Instances/UPred/InternalEq.lean`)
 - `ascii.v`
 - [x] `bi.v`
-- [ ] `big_op.v`
+- [x] `big_op.v`
+  - [x] `big_sepL`, `big_sepM` definitions and lemmas
 - [ ] `cmra.v`
 - [x] `derived_connectives.v`
 - [ ] `derived_laws.v`
@@ -215,7 +217,11 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
   - [ ] BIPureForall
 - [ ] `interface.v` 
   - [ ] Later instances
-- [ ] `internal_eq.v`
+- [ ] `internal_eq.v` (nb. `UPred.eq` + bridge lemmas in `Instances/UPred/InternalEq.lean`; full port needs SBI)
+  - [x] `internal_eq_refl`
+  - [x] `internal_eq_persistent`
+  - [x] `to_agree_op_validI` (forward direction, as `cmraValid_agree_internal_eq`)
+  - [x] `prod_validI` (as `cmraValid_prod_fst`, `cmraValid_prod_snd`)
 - [ ] `monopred.v`
   - [ ] COFE
   - [ ] BI instance
@@ -231,7 +237,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 - [ ] `updates.v`
   - [x] FUpd class
   - [ ] Big op lemmas
-- [ ] `weakestpre.v`
+- [x] `weakestpre.v`
 - [ ] `lib/atomic.v`
 - [ ] `lib/core.v`
 - [ ] `lib/counterexamples.v`
@@ -422,8 +428,7 @@ Some porting tasks will require other tasks as dependencies, the GitHub issues p
 
 - Program Logic
   - Final decisions about what to port from this folder have not been made yet.
-  - [ ] `language.v`
+  - [x] `language.v`
+  - [x] `adequacy.v`
   - [ ] `ectx_language.v`
   - [ ] `ectxi_language.v`
-
-
